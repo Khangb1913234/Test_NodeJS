@@ -8,8 +8,7 @@ const passport = require("passport")
 const dotenv = require("dotenv")
 dotenv.config()
 
-
-const setupAccountRoutes = require("./routes/account.route")
+const route = require("./routes")
 const db = require("./config/db")
 
 db.connect()
@@ -34,7 +33,7 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 });
 
-setupAccountRoutes(app)
+route(app)
 
 app.listen(PORT, function(){
     console.log(`Runing at: http://localhost:${PORT}`)

@@ -1,8 +1,10 @@
 const express = require("express")
 const auth = require('../app/middlewares/auth.middleware');
+const validate = require("../app/middlewares/validation.middleware")
+const upload = require("../app/middlewares/upload.middleware")
 const accounts = require("../app/controllers/account.controller")
 const Account = require("../app/models/account.model")
-const upload = require("../app/middlewares/upload.middleware")
+
 const passport = require("passport")
 const FacebookStrategy = require("passport-facebook").Strategy
 const dotenv = require("dotenv")
@@ -34,19 +36,17 @@ passport.use(new FacebookStrategy({
   }
 ));
 
-module.exports = function(app){
-    const router = express.Router()
-    router.get("/login/facebook/callback", passport.authenticate("facebook", {failureRedirect: "/login"}), accounts.loginFacebook)
-    router.get("/login/facebook", passport.authenticate("facebook", {scope: "email"}))
-    
-    router.post("/register", accounts.register)
-    router.post("/login", accounts.login)
-    router.put("/update/:id", upload.single("avatar"), auth, accounts.update)   
-    router.delete("/delete/:id", auth, accounts.delete)
-    router.post("/forgotpassword", accounts.forgotPassword)
-    router.put("/resetpassword", accounts.resetPassword)
-    router.post("/seeddata/:number", auth, accounts.seedData)
-    router.get("/:id", auth, accounts.findOne)
-    router.get("/", auth, accounts.findAll)
-    app.use("/account", router)
-};
+const router = express.Router()
+router.get("/login/facebook/callback", passport.authenticate("facebook", {failureRedirect: "/login"}), accounts.loginFacebook)
+router.get("/login/facebook", passport.authenticate("facebook", {scope: "email"}))
+router.post("/register", validate.validateEmail, validate.validatePassword, accounts.register)
+router.post("/login", accounts.login)
+router.put("/update/:id", upload.single("avatar"), auth, validate.validateEmail, validate.validatePassword, accounts.update)   
+router.delete("/delete/:id", auth, accounts.delete)
+router.post("/forgotpassword", accounts.forgotPassword)
+router.put("/resetpassword", accounts.resetPassword)
+router.post("/seeddata/:number", auth, accounts.seedData)
+router.get("/:id", auth, accounts.findOne)
+router.get("/", auth, accounts.findAll)
+
+module.exports = router

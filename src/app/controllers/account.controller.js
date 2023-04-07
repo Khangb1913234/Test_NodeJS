@@ -9,20 +9,6 @@ dotenv.config()
 
 exports.register = async function(req, res, next){                 
     try{
-        const validateEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if(!validateEmail.test(req.body.email)){
-            res.status(400).json({err: "Email không hợp lệ"})
-            return
-        }
-        if(req.body.password !== req.body.confirmPassword){
-            res.status(400).json(({err: "2 password không giống nhau"}))
-            return
-        }
-        const validatePassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{10,}$/
-        if(!validatePassword.test(req.body.password)){
-            res.status(400).json({err: "Password phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, 1 kí tự đặc biệt và có độ dài tối thiểu là 10 kí tự"})
-            return
-        }
         const account = await Account.findOne({email: req.body.email})
         if(account){
             res.json({err: "Email đã được sử dụng"})
@@ -140,11 +126,6 @@ exports.update = async function(req, res, next){
         if((req.account.role == 1) || (req.account.role == 0 && req.account._id == id)){
             const data = req.body
             if(data.email){
-                const validateEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                if(!validateEmail.test(data.email)){
-                    res.status(400).json({err: "Email không hợp lệ"})
-                    return
-                }
                 const checkAccount = await Account.findOne({email: data.email})
                 if(checkAccount){
                     res.status(400).json({err: "Email đã được sử dụng"})
@@ -152,18 +133,9 @@ exports.update = async function(req, res, next){
                 }
             }
             if(data.oldPassword && data.password){
-                const check = bcrypt.compareSync(req.body.oldPassword, account.password)
+                const check = bcrypt.compareSync(req.body.oldPassword, req.account.password)
                 if(!check){
                     res.status(401).json({err: "Sai mật khẩu"})
-                    return
-                }
-                if(data.password !== data.confirmPassword){
-                    res.status(400).json({err: "2 password không khớp nhau"})
-                    return
-                }
-                const validatePassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{10,}$/
-                if(!validatePassword.test(data.password)){
-                    res.status(400).json({err: "Password phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, 1 kí tự đặc biệt và có độ dài tối thiểu là 10 kí tự"})
                     return
                 }
                 data.password = bcrypt.hashSync(data.password, 10)
@@ -171,7 +143,6 @@ exports.update = async function(req, res, next){
             if(req.file){
                 data.image = req.file.buffer.toString("base64")
             }
-            
             if(req.account.role == 1){
                 const modifyAccount = await Account.findOneAndUpdate({_id: id}, data, {new: true})
                 if(!modifyAccount){

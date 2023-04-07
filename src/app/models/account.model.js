@@ -10,6 +10,7 @@ const schema = mongoose.Schema(
 		},
 		password: {
 			type: String,
+			match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{10,}$/,
 			//required: [true, 'Password is required'],
             
 		},
