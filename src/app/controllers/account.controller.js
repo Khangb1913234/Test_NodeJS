@@ -100,13 +100,13 @@ exports.findOne = async function(req, res, next){
     try{
         const id = req.params.id
         if((req.account.role == 1) || (req.account.role == 0 && req.account._id == id)){
-            const findAccount = await Account.findOne({_id: id})
-            if(!findAccount){
+            const resultAccount = await Account.findOne({_id: id})
+            if(!resultAccount){
                 res.status(404).json({err: "Tài khoản không tồn tại"})
                 return
             }
             else{
-                res.status(200).json({account: findAccount})
+                res.status(200).json({account: resultAccount})
             }
         }
         else{
@@ -126,8 +126,8 @@ exports.update = async function(req, res, next){
         if((req.account.role == 1) || (req.account.role == 0 && req.account._id == id)){
             const data = req.body
             if(data.email){
-                const checkAccount = await Account.findOne({email: data.email})
-                if(checkAccount){
+                const checkedAccount = await Account.findOne({email: data.email})
+                if(checkedAccount){
                     res.status(400).json({err: "Email đã được sử dụng"})
                     return
                 }
@@ -144,24 +144,24 @@ exports.update = async function(req, res, next){
                 data.image = req.file.buffer.toString("base64")
             }
             if(req.account.role == 1){
-                const modifyAccount = await Account.findOneAndUpdate({_id: id}, data, {new: true})
-                if(!modifyAccount){
+                const modifiedAccount = await Account.findOneAndUpdate({_id: id}, data, {new: true})
+                if(!modifiedAccount){
                     res.status(404).json({err: "Tài khoản không tồn tại"})
                     return
                 }
                 else{
-                    res.status(200).json({msg: "Cập nhật tài khoản", account: modifyAccount})
+                    res.status(200).json({msg: "Cập nhật tài khoản", account: modifiedAccount})
                 }
             }
             else{
                 const {role, ...updatedFields} = data;
-                const modifyAccount = await Account.findOneAndUpdate({_id: id}, {$set: updatedFields}, {new: true})
-                if(!modifyAccount){
+                const modifiedAccount = await Account.findOneAndUpdate({_id: id}, {$set: updatedFields}, {new: true})
+                if(!modifiedAccount){
                     res.status(404).json({err: "Tài khoản không tồn tại"})
                     return
                 }
                 else{
-                    res.status(200).json({msg: "Cập nhật tài khoản", account: modifyAccount})
+                    res.status(200).json({msg: "Cập nhật tài khoản", account: modifiedAccount})
                 }
             }
         }
@@ -211,8 +211,8 @@ exports.forgotPassword = async function(req, res, next){
         const resetPasswordToken = jwt.sign({id: account._id}, process.env.JWT_RESET_PASSWORD, {expiresIn: 600})
         const now = new Date()
         const expire = new Date(now.getTime() + 10 * 60000);
-        const modifyAccount = await Account.findOneAndUpdate({email: req.body.email}, {resetPasswordToken: resetPasswordToken, resetPasswordExpires: expire}, {new: true})
-        if(!modifyAccount){
+        const modifiedAccount = await Account.findOneAndUpdate({email: req.body.email}, {resetPasswordToken: resetPasswordToken, resetPasswordExpires: expire}, {new: true})
+        if(!modifiedAccount){
             res.status(404).json({err: "Tài khoản không tồn tại"})
             return
         }
@@ -265,19 +265,10 @@ exports.resetPassword = async function(req, res, next){
                 return
             }
             else{
-                if(req.body.password !== req.body.confirmPassword){
-                    res.status(400).json({err: "2 password không khớp nhau"})
-                    return
-                }
-                const validatePassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{10,}$/
-                if(!validatePassword.test(req.body.password)){
-                    res.status(400).json({err: "Password phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, 1 kí tự đặc biệt và có độ dài tối thiểu là 10 kí tự"})
-                    return
-                }
-                const modifyAccount = await Account.findOneAndUpdate({resetPasswordToken: req.body.resetPasswordToken}, 
+                const modifiedAccount = await Account.findOneAndUpdate({resetPasswordToken: req.body.resetPasswordToken}, 
                                                                     {password: bcrypt.hashSync(req.body.password, 10), 
                                                                     resetPasswordToken: null, resetPasswordExpires: null}, {new: true})
-                if(!modifyAccount){
+                if(!modifiedAccount){
                     res.status(404).json({err: "Mã xác nhận không khớp"})
                     return
                 }
