@@ -8,7 +8,7 @@ exports.validateName = function(req, res, next){
         }
         if(req.body.lastName){
             if(req.body.lastName.length > 50){
-                res.status(400).json({err: "Tên không được dài quá 50 kí tự"})
+                res.status(400).json({err: "Họ không được dài quá 50 kí tự"})
                 return
             }
         }
