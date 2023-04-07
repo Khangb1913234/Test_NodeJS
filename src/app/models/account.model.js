@@ -17,7 +17,7 @@ const schema = mongoose.Schema(
         firstName: {
 			type: String,
 			required: [true, 'fisrtName is required'],
-            maxlength: 50
+            maxlength: 50,
 		},
         lastName: {
 			type: String,
@@ -26,7 +26,7 @@ const schema = mongoose.Schema(
 		},
 		role: {
             type: Number,
-            required: [true, 'lastName is required']
+            required: [true, 'role is required']
         },
         image: {
             type: String

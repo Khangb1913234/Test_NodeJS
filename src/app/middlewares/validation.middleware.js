@@ -1,3 +1,25 @@
+exports.validateName = function(req, res, next){
+    try{
+        if(req.body.firstName){
+            if(req.body.firstName.length > 50){
+                res.status(400).json({err: "Tên không được dài quá 50 kí tự"})
+                return
+            }
+        }
+        if(req.body.lastName){
+            if(req.body.lastName.length > 50){
+                res.status(400).json({err: "Tên không được dài quá 50 kí tự"})
+                return
+            }
+        }
+        next()
+    }
+    catch(err){
+        console.error(err.message)
+        res.status(500).json({ err: `Err: ${err.message}` })
+    }
+}
+
 exports.validateEmail = function(req, res, next){
     try{
         if(req.body.email){

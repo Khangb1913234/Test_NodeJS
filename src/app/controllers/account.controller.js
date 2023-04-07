@@ -126,15 +126,15 @@ exports.update = async function(req, res, next){
         if((req.account.role == 1) || (req.account.role == 0 && req.account._id == id)){
             const data = req.body
             if(data.email){
-                const checkedAccount = await Account.findOne({email: data.email})
-                if(checkedAccount){
+                const existedAccount = await Account.findOne({email: data.email})
+                if(existedAccount){
                     res.status(400).json({err: "Email đã được sử dụng"})
                     return
                 }
             }
             if(data.oldPassword && data.password){
-                const check = bcrypt.compareSync(req.body.oldPassword, req.account.password)
-                if(!check){
+                const check = bcrypt.compareSync(data.oldPassword, req.account.password)
+                if(!check && req.account.role != 1){
                     res.status(401).json({err: "Sai mật khẩu"})
                     return
                 }
@@ -154,8 +154,8 @@ exports.update = async function(req, res, next){
                 }
             }
             else{
-                const {role, ...updatedFields} = data;
-                const modifiedAccount = await Account.findOneAndUpdate({_id: id}, {$set: updatedFields}, {new: true})
+                const {role, ...rest} = data;
+                const modifiedAccount = await Account.findOneAndUpdate({_id: id}, {$set: rest}, {new: true})
                 if(!modifiedAccount){
                     res.status(404).json({err: "Tài khoản không tồn tại"})
                     return
