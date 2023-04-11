@@ -57,7 +57,6 @@ exports.validatePassword = function(req, res, next){
                 return
             }
             const validatePassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{10,}$/
-            console.log("t" + req.body.password + "t")
             if(!validatePassword.test(req.body.password)){
                 res.status(400).json({err: "Password phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, 1 kí tự đặc biệt và có độ dài tối thiểu là 10 kí tự"})
                 return
