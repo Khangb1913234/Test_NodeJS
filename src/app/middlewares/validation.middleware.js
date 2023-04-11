@@ -6,11 +6,19 @@ exports.validateName = function(req, res, next){
                 return
             }
         }
+        else{
+            res.status(400).json({err: "Tên không được trống"})
+            return
+        }
         if(req.body.lastName){
             if(req.body.lastName.length > 50){
                 res.status(400).json({err: "Họ không được dài quá 50 kí tự"})
                 return
             }
+        }
+        else{
+            res.status(400).json({err: "Họ không được trống"})
+            return
         }
         next()
     }
@@ -29,6 +37,10 @@ exports.validateEmail = function(req, res, next){
                 return
             }
         }
+        else{
+            res.status(400).json({err: "Email không được trống"})
+            return
+        }
         next()
         
     }
@@ -45,10 +57,15 @@ exports.validatePassword = function(req, res, next){
                 return
             }
             const validatePassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{10,}$/
+            console.log("t" + req.body.password + "t")
             if(!validatePassword.test(req.body.password)){
                 res.status(400).json({err: "Password phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, 1 kí tự đặc biệt và có độ dài tối thiểu là 10 kí tự"})
                 return
             }
+        }
+        else{
+            res.status(400).json({err: "Password không được trống"})
+            return
         }
         next()
     }
